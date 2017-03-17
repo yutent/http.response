@@ -1,0 +1,14 @@
+{
+  "name": "http.response",
+  "version": "0.1.0",
+  "description": "Simple api for http response.",
+  "main": "lib/main.js",
+  "author": "yutent",
+  "keywords": [
+    "dojs",
+    "response",
+    "http"
+  ],
+  "repository": "https://github.com/yutent/http.response.git",
+  "license": "MIT"
+}
