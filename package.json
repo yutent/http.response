@@ -1,6 +1,6 @@
 {
   "name": "http.response",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple api for http response.",
   "main": "lib/main.js",
   "author": "yutent",
