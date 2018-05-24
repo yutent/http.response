@@ -1,11 +1,11 @@
 {
   "name": "http.response",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Simple api for http response.",
-  "main": "lib/main.js",
+  "main": "index.js",
   "author": "yutent",
   "keywords": [
-    "dojs",
+    "fivejs",
     "response",
     "http"
   ],
