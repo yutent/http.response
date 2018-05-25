@@ -12,9 +12,8 @@ const UTIL = require('util')
 
 class Response {
   constructor(req, res) {
-    this.req = req
-    this.res = res
-    this.res.rendered = false
+    this.origin = { req, res }
+    this.rendered = false
   }
 
   /**
@@ -23,20 +22,22 @@ class Response {
    * @param  {String} msg  [错误提示信息]
    */
   error(msg, code = 500) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
-    this.res.writeHead(code, { 'Content-Type': 'text/html; charset=utf-8' })
+    this.origin.res.writeHead(code, {
+      'Content-Type': 'text/html; charset=utf-8'
+    })
     this.end(
       `<fieldset><legend>Http Status: ${code}</legend><pre>${msg}</pre></fieldset>`
     )
   }
 
   status(code = 404) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
-    this.res.writeHead(code)
+    this.origin.res.writeHead(code)
   }
 
   /**
@@ -45,7 +46,7 @@ class Response {
    * @param  {String} val [description]
    */
   append(key, val) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     let prev = this.get(key)
@@ -69,14 +70,14 @@ class Response {
    * @param  {Boolean} f   [是否永久重定向]
    */
   redirect(url, f = false) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     if (!/^(http[s]?|ftp):\/\//.test(url)) {
       url = '//' + url
     }
 
-    this.res.writeHead(f ? 301 : 302, { Location: url })
+    this.origin.res.writeHead(f ? 301 : 302, { Location: url })
     this.end('')
   }
 
@@ -84,7 +85,7 @@ class Response {
    * [location 页面跳转(前端的方式)]
    */
   location(url) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     let html = `<html><head><script>location.href="${url}"</script></head></html>`
@@ -93,7 +94,7 @@ class Response {
 
   // 以html格式向前端输出内容
   render(data, code = 200) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     data += ''
@@ -105,7 +106,7 @@ class Response {
 
   // 文件下载
   sendfile(data, filename) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     this.set('Content-Type', 'application/force-download')
@@ -123,7 +124,7 @@ class Response {
    * @param  {Str}        callback [回调函数名]
    */
   send(code = 200, msg = 'success', data = null, callback = null) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return
     }
     if (!UTIL.isNumber(code)) {
@@ -155,25 +156,25 @@ class Response {
   }
 
   end(buf) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return this
     }
-    this.res.rendered = true
-    this.res.end(buf || '')
+    this.rendered = true
+    this.origin.res.end(buf || '')
   }
 
   /**
    * [get 读取已写入的头信息]
    */
   get(key) {
-    return this.res.getHeader(key)
+    return this.origin.res.getHeader(key)
   }
 
   /**
    * [set 设置头信息]
    */
   set(key, val) {
-    if (this.res.rendered) {
+    if (this.rendered) {
       return this
     }
     if (arguments.length === 2) {
@@ -183,7 +184,7 @@ class Response {
         value += '; charset=utf-8'
       }
 
-      this.res.setHeader(key, value)
+      this.origin.res.setHeader(key, value)
     } else {
       for (let i in key) {
         this.set(i, key[i])
