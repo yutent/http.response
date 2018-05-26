@@ -31,6 +31,15 @@ http
 
 ## API
 
+
+### origin
+> return the native request & response.
+
+
+### statusText
+> the list of http-status's text.
+
+
 ### error(msg[, code])
 
 * msg `<String>`
@@ -40,6 +49,7 @@ http
 
 ```javascript
 response.error('This is the error code', 500) //
+response.error(null, 500) // null/empty, it will call the statusText back
 response.error('Page not Found', 404) //
 response.error(new Error('Auth denied'), 401) //
 ```

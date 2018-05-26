@@ -9,10 +9,12 @@
 
 const CHARSET_REGEXP = /;\s*charset\s*=/
 const UTIL = require('util')
+const statusText = require('./lib/http-code-msg.json')
 
 class Response {
   constructor(req, res) {
     this.origin = { req, res }
+    this.statusText = statusText
     this.rendered = false
   }
 
@@ -28,6 +30,7 @@ class Response {
     this.origin.res.writeHead(code, {
       'Content-Type': 'text/html; charset=utf-8'
     })
+    msg = msg || statusText[code]
     this.end(
       `<fieldset><legend>Http Status: ${code}</legend><pre>${msg}</pre></fieldset>`
     )
@@ -98,9 +101,12 @@ class Response {
       return
     }
     data += ''
+    data = data || statusText[code]
     this.set('Content-Type', 'text/html')
     this.set('Content-Length', Buffer.byteLength(data))
-    if (code !== 200) this.status(code)
+    if (code !== 200) {
+      this.status(code)
+    }
     this.end(data)
   }
 
