@@ -1,14 +1,10 @@
 {
   "name": "http.response",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple api for http response.",
   "main": "index.js",
   "author": "yutent",
-  "keywords": [
-    "fivejs",
-    "response",
-    "http"
-  ],
+  "keywords": ["fivejs", "response", "http"],
   "repository": "https://github.com/yutent/http.response.git",
   "license": "MIT"
 }

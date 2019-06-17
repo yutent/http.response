@@ -138,8 +138,8 @@ class Response {
       code = 400
     } else if (typeof msg === 'object') {
       data = msg
-      msg = 'success'
       code = code || 200
+      msg = statusText[code] || 'success'
     }
 
     let output = { code, msg, data }
