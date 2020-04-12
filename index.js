@@ -28,9 +28,8 @@ class Response {
     }
     msg = msg || statusText[code]
 
-    this.origin.res.writeHead(code, msg, {
-      'Content-Type': 'text/html; charset=utf-8'
-    })
+    this.status(code)
+    this.set('Content-Type': 'text/html; charset=utf-8')
     this.end(
       `<fieldset><legend>Http Status: ${code}</legend><pre>${msg}</pre></fieldset>`
     )
@@ -76,8 +75,8 @@ class Response {
     if (!/^(http[s]?|ftp):\/\//.test(url)) {
       url = '//' + url
     }
-
-    this.origin.res.writeHead(f ? 301 : 302, { Location: url })
+    this.set('Location', url)
+    this.status(f ? 301 : 302)
     this.end('')
   }
 
