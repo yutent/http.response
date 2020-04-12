@@ -14,7 +14,6 @@ const statusText = require('./lib/http-code-msg.json')
 class Response {
   constructor(req, res) {
     this.origin = { req, res }
-    this.statusText = statusText
     this.rendered = false
   }
 
@@ -27,20 +26,18 @@ class Response {
     if (this.rendered) {
       return
     }
-    this.origin.res.writeHead(code, {
+    msg = msg || statusText[code]
+
+    this.origin.res.writeHead(code, msg, {
       'Content-Type': 'text/html; charset=utf-8'
     })
-    msg = msg || statusText[code]
     this.end(
       `<fieldset><legend>Http Status: ${code}</legend><pre>${msg}</pre></fieldset>`
     )
   }
 
   status(code = 404) {
-    if (this.rendered) {
-      return
-    }
-    this.origin.res.writeHead(code)
+    this.statusCode = code
   }
 
   /**
@@ -88,15 +85,15 @@ class Response {
    * [location 页面跳转(前端的方式)]
    */
   location(url) {
+    var html = `<html><head><script>location.href="${url}"</script></head></html>`
     if (this.rendered) {
       return
     }
-    let html = `<html><head><script>location.href="${url}"</script></head></html>`
     this.render(html)
   }
 
   // 以html格式向前端输出内容
-  render(data, code = 200) {
+  render(data, code) {
     if (this.rendered) {
       return
     }
@@ -104,7 +101,7 @@ class Response {
     data = data || statusText[code]
     this.set('Content-Type', 'text/html')
     this.set('Content-Length', Buffer.byteLength(data))
-    if (code !== 200) {
+    if (code) {
       this.status(code)
     }
     this.end(data)
@@ -130,6 +127,8 @@ class Response {
    * @param  {Str}        callback [回调函数名]
    */
   send(code = 200, msg = 'success', data = null, callback = null) {
+    var output
+
     if (this.rendered) {
       return
     }
@@ -142,7 +141,7 @@ class Response {
       msg = statusText[code] || 'success'
     }
 
-    let output = { code, msg, data }
+    output = { code, msg, data }
     output = JSON.stringify(output)
 
     if (callback) {
@@ -153,8 +152,8 @@ class Response {
     this.set('Content-Type', 'application/json')
     this.set('Content-Length', Buffer.byteLength(output))
 
-    //非200, 直接设置http状态为该code值
-    if (code > 200) {
+    // 只设置200以上的值
+    if (code && code > 200) {
       this.status(code)
     }
 
@@ -162,10 +161,16 @@ class Response {
   }
 
   end(buf) {
+    var code = 200
     if (this.rendered) {
       return this
     }
+    if (this.statusCode) {
+      code = this.statusCode
+      delete this.statusCode
+    }
     this.rendered = true
+    this.origin.res.writeHead(code, statusText[code])
     this.origin.res.end(buf || '')
   }
 

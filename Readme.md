@@ -36,9 +36,6 @@ http
 > return the native request & response.
 
 
-### statusText
-> the list of http-status's text.
-
 
 ### error(msg[, code])
 
