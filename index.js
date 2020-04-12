@@ -29,7 +29,7 @@ class Response {
     msg = msg || statusText[code]
 
     this.status(code)
-    this.set('Content-Type': 'text/html; charset=utf-8')
+    this.set('Content-Type', 'text/html; charset=utf-8')
     this.end(
       `<fieldset><legend>Http Status: ${code}</legend><pre>${msg}</pre></fieldset>`
     )
